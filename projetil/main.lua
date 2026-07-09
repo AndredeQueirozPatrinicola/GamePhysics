@@ -55,30 +55,29 @@ function love.update(dt)
         end
     end
 
-    if isDragging then
-        if love.mouse.isDown(2) then
-            vector_x = love.mouse.getX()
-            vector_y = love.mouse.getY()
-
-            direction_x = mouse_x - vector_x 
-            direction_y = mouse_y - vector_y             
-
-            projectile.velocity = {
-                x = direction_x * 0.05,
-                y = direction_y * 0.05
-            }
-
-            isDragging = false
-            
-            projectile.isBeingDragged = false
-        end
-    end
-
     for i, p in ipairs(projectiles) do
         p.pos.x = p.pos.x + p.velocity.x
         p.pos.y = p.pos.y + p.velocity.y
     end
-end 
+end
+
+function love.mousereleased(x, y, button)
+    if button == 1 then
+        vector_x = love.mouse.getX()
+        vector_y = love.mouse.getY()
+
+        direction_x = mouse_x - vector_x 
+        direction_y = mouse_y - vector_y             
+
+        projectile.velocity = {
+            x = direction_x * 0.05,
+            y = direction_y * 0.05
+        }
+
+        isDragging = false
+        projectile.isBeingDragged = false
+    end
+end
 
 function love.draw()
     for i, p in ipairs(projectiles) do
