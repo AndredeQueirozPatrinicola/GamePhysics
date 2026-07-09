@@ -1,4 +1,4 @@
-gravity = 9.8
+gravity = 980
 
 
 function getNewProjectile()
@@ -16,7 +16,8 @@ function getNewProjectile()
             x = 0,
             y = 0
         },
-        isBeingDragged = false
+        isBeingDragged = false,
+        speed = 5
     }
 end
 
@@ -56,8 +57,8 @@ function love.update(dt)
     end
 
     for i, p in ipairs(projectiles) do
-        p.pos.x = p.pos.x + p.velocity.x
-        p.pos.y = p.pos.y + p.velocity.y
+        p.pos.x = p.pos.x + p.velocity.x * dt
+        p.pos.y = p.pos.y + p.velocity.y * dt
     end
 end
 
@@ -70,8 +71,8 @@ function love.mousereleased(x, y, button)
         direction_y = mouse_y - vector_y             
 
         projectile.velocity = {
-            x = direction_x * 0.05,
-            y = direction_y * 0.05
+            x = direction_x * projectile.speed,
+            y = direction_y * projectile.speed
         }
 
         isDragging = false
