@@ -22,7 +22,7 @@ function Projectile:new()
             y = 0
         },
         speed = 5,
-        size = 10,
+        radius = 10,
         canMove = false
     }
     setmetatable(obj, self)
@@ -40,7 +40,7 @@ function Projectile:update(dt)
 end
 
 function Projectile:draw()
-    love.graphics.circle('fill', self.position.x, self.position.y, self.size)
+    love.graphics.circle('fill', self.position.x, self.position.y, self.radius)
 end
 
 function Projectile:mousereleased()
@@ -83,10 +83,17 @@ end
 
 function Wall:update(dt, obj)
     if(self:object_entered_area(obj)) then
-        if obj.velocity.x < self.position.x then
+        -- if obj.velocity.x < self.position.x then
+        --     obj.velocity.x = obj.velocity.x * -1
+        -- end
+        -- if obj.velocity.y < self.position.y then
+        --     obj.velocity.y = obj.velocity.y * -1
+        -- end
+
+        if self.type == 'vertical' then
             obj.velocity.x = obj.velocity.x * -1
-        end
-        if obj.velocity.y < self.position.y then
+        end 
+        if self.type == 'horizontal' then 
             obj.velocity.y = obj.velocity.y * -1
         end
     end
@@ -94,11 +101,11 @@ end
 
 function Wall:object_entered_area(obj) 
         return (
-        obj.position.x >= self.position.x and 
-        obj.position.x <= self.position.x + self.dimensions.w and
-        obj.position.y >= self.position.y and
-        obj.position.y <= self.position.y + self.dimensions.h
-    )
+            (obj.position.x + obj.radius) >= self.position.x and 
+            (obj.position.x + obj.radius) <= self.position.x + self.dimensions.w and
+            (obj.position.y + obj.radius) >= self.position.y and
+            (obj.position.y + obj.radius) <= self.position.y + self.dimensions.h
+        )
 end
 
 function Wall:draw()
@@ -128,6 +135,7 @@ function love.load()
                 w = 50, 
                 h = 720,
             },
+            type = 'vertical'
         }),
         Wall:new({
             position = {
@@ -138,7 +146,19 @@ function love.load()
                 w = 1500, 
                 h = 20,
             },
-        })
+            type = 'horizontal'
+        }),
+         Wall:new({
+            position = {
+            x = -20,
+            y = 0
+            },
+            dimensions = {
+                w = 50, 
+                h = 720,
+            },
+            type = 'vertical'
+        }),
     }
 end
 
