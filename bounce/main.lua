@@ -17,7 +17,7 @@ function Projectile:new()
             x = 0,
             y = 0
         },
-        startPosition = {
+        start_position = {
             x = 0,
             y = 0
         },
@@ -56,8 +56,8 @@ function Projectile:launch()
     vector_x = love.mouse.getX()
     vector_y = love.mouse.getY()
     
-    direction_x = self.startPosition.x - vector_x 
-    direction_y = self.startPosition.y - vector_y 
+    direction_x = self.start_position.x - vector_x 
+    direction_y = self.start_position.y - vector_y 
 
     self.velocity.x = direction_x * self.speed
     self.velocity.y = direction_y * self.speed
@@ -74,22 +74,38 @@ function Wall:new(obj)
         dimensions = {
             w = 0, 
             h = 0,
-        },
+        }
     }
     setmetatable(obj, self)
     self.__index = self
     return obj
 end
 
-function Wall:update()
-    
+function Wall:update(dt, obj)
+    if(self:object_entered_area(obj)) then
+        if obj.velocity.x < self.position.x then
+            obj.velocity.x = obj.velocity.x * -1
+        end
+        if obj.velocity.y < self.position.y then
+            obj.velocity.y = obj.velocity.y * -1
+        end
+    end
+end
+
+function Wall:object_entered_area(obj) 
+        return (
+        obj.position.x >= self.position.x and 
+        obj.position.x <= self.position.x + self.dimensions.w and
+        obj.position.y >= self.position.y and
+        obj.position.y <= self.position.y + self.dimensions.h
+    )
 end
 
 function Wall:draw()
-    love.graphics.polygon('fill', self:getVertices())
+    love.graphics.polygon('fill', self:get_vertices())
 end
 
-function Wall:getVertices()
+function Wall:get_vertices()
     return {
         self.position.x, self.position.y,
         self.position.x + self.dimensions.w,  self.position.y,
@@ -102,26 +118,28 @@ end
 
 function love.load()
     projectiles = {}
-    wall = Wall:new({
-        position = {
-        x = 1490,
-        y = 0
-        },
-        dimensions = {
-            w = 10, 
-            h = 720,
-        },
-    })
-    floor = Wall:new({
-        position = {
-        x = 0,
-        y = 710
-        },
-        dimensions = {
-            w = 1500, 
-            h = 10,
-        },
-    })
+    walls = {
+        Wall:new({
+            position = {
+            x = 1470,
+            y = 0
+            },
+            dimensions = {
+                w = 50, 
+                h = 720,
+            },
+        }),
+        Wall:new({
+            position = {
+            x = 0,
+            y = 700
+            },
+            dimensions = {
+                w = 1500, 
+                h = 20,
+            },
+        })
+    }
 end
 
 function love.update(dt)
@@ -136,8 +154,8 @@ function love.update(dt)
             projectile.position.x = mouse_x
             projectile.position.y = mouse_y
 
-            projectile.startPosition.x = mouse_x
-            projectile.startPosition.y = mouse_y
+            projectile.start_position.x = mouse_x
+            projectile.start_position.y = mouse_y
             
             projectile.canMove = false
             dragging = true
@@ -148,6 +166,10 @@ function love.update(dt)
 
     for i, p in ipairs(projectiles) do
         p:update(dt)
+
+        for i, w in ipairs(walls) do
+            w:update(dt, p) 
+        end
     end
 end
 
@@ -166,6 +188,7 @@ function love.draw()
         p:draw()
     end
 
-    wall:draw()
-    floor:draw()    
+    for i, w in ipairs(walls) do
+        w:draw() 
+    end   
 end
