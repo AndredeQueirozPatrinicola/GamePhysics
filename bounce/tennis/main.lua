@@ -2,7 +2,6 @@ Ball = {}
 Platform = {}
 Game = {}
 
-
 function Ball:new(obj) 
     obj = obj or {}
     setmetatable(obj, self)
@@ -15,9 +14,6 @@ function Ball:load(obj)
 end 
 
 function Ball:update(dt)
-    self.position.x = self.position.x + self.velocity.x * self.speed * dt
-    self.position.y = self.position.y + self.velocity.y * self.speed * dt
-
     if self.position.y < 0 or self.position.y > 720 then 
         self.velocity.y = self.velocity.y * -1
     end
@@ -28,6 +24,9 @@ function Ball:update(dt)
         self.velocity.x = -50
         self.velocity.y = 0
     end
+
+    self.position.x = self.position.x + self.velocity.x * self.speed * dt
+    self.position.y = self.position.y + self.velocity.y * self.speed * dt
 end
 
 function Ball:draw()  
@@ -63,6 +62,15 @@ function Platform:update(dt, obj)
     end
     if love.keyboard.isDown("s") then
         self.velocity.y = (self.velocity.y + 1) 
+    end
+
+    if self.position.y + self.height > 750 then 
+        self.velocity.y = self.velocity.y * -0.8
+    end
+
+    if self.position.y < -30 then 
+
+        self.velocity.y = self.velocity.y * -0.8
     end
 
     self.position.y = self.position.y + self.velocity.y * self.speed * dt
